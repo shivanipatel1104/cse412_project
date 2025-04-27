@@ -31,5 +31,9 @@ def search():
 def profile():
     return render_template('profile.html')
 
+@app.route('/likedsongs')
+def likedsongs():
+    return render_template('likedsongs.html')
+
 if __name__ == '__main__':
     app.run(debug=True)
