@@ -1,5 +1,4 @@
 import psycopg2
-import psycopg2.extras
 
 def get_db_connection():
     conn = psycopg2.connect(
@@ -8,6 +7,5 @@ def get_db_connection():
         user='postgres',
         password='0411BPTp',
         port='5432',
-        cursor_factory=psycopg2.extras.DictCursor
     )
     return conn
