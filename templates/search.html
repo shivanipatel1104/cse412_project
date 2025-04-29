@@ -18,25 +18,58 @@
                         <a class="nav-link" href="{{ url_for('home_page.home') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('search') }}">Search</a>
+                        <a class="nav-link" href="{{ url_for('search_page.song_search') }}">Search</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('playlist_list_page.user_playlists') }}">Playlists</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('likedsongs') }}">Liked Songs</a>
+                        <a class="nav-link" href="{{ url_for('liked_songs_page.liked_songs') }}">Liked Songs</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('profile') }}">Profile</a>
+                        <a class="nav-link" href="{{ url_for('profile_page.profile') }}">Profile</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-
     <div class="container py-5">
         <h2 class="mb-4">Search</h2> 
+
+        {% if error %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('search_page.song_search') }}">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Search for a song..." name="search_query" required>
+                <button class="btn btn-primary" type="submit">Search</button>
+            </div>
+        </form>
+
+        {% if songs %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Song Name</th>
+                        <th>Album ID</th>
+                        <th>Genre</th>
+                        <th>Duration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for song in songs %}
+                    <tr>
+                        <td>{{ song[0] }}</td>
+                        <td>{{ song[1] }}</td>
+                        <td>{{ song[2] }}</td>
+                        <td>{{ song[3] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
     </div>
     
 </body>

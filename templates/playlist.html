@@ -36,8 +36,62 @@
 
 
     <div class="container py-5">
-        <h2 class="mb-4">Playlists</h2> 
+        <!-- <h2 class="mb-4">Playlists</h2>  -->
+    </div>
+
+    <div class="container">
+        <h1>Playlist Page</h1>
+        <p>Playlist ID: <strong>{{ playlist_id }}</strong></p>
+
+        <p>This is a placeholder page. More playlist details will be shown here soon!</p>
+
+        <a href="{{ url_for('playlist_list_page.user_playlists') }}">← Back to your playlists</a>
     </div>
     
+<!-- <html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Playlist Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f0f2f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 600px;
+            margin: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        p {
+            font-size: 18px;
+            color: #666;
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #007BFF;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Playlist Page</h1>
+        <p>Playlist ID: <strong>{{ playlist_id }}</strong></p>
+
+        <p>This is a placeholder page. More playlist details will be shown here soon!</p>
+
+        <a href="{{ url_for('playlist_list_page.user_playlists') }}">← Back to your playlists</a>
+    </div>
 </body>
-</html>
+</html> -->

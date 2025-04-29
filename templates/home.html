@@ -18,7 +18,7 @@
                         <a class="nav-link" href="{{ url_for('home_page.home') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('search') }}">Search</a>
+                        <a class="nav-link" href="{{ url_for('search_page.song_search') }}">Search</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('playlist_list_page.user_playlists') }}">Playlists</a>
@@ -35,8 +35,16 @@
     </nav>
 
     <div class="container py-5">
-        <h2 class="mb-4">Home</h2> 
+        <h2 class="mb-4">Music Player: Home</h2>
+
+        <a href="{{ url_for('playlist_list_page.user_playlists') }}" class="btn btn-primary">
+            View Playlists
+        </a>
+
+        <a href="{{ url_for('search_page.song_search') }}" class="btn btn-primary">
+            Search for Songs
+        </a>
+
     </div>
-    
 </body>
-</html>
+</html
