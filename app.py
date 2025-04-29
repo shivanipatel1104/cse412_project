@@ -1,27 +1,20 @@
+from flask import Flask, render_template
+from login_page import login_page
+from sign_up_page import sign_up_page
+from home_page import home_page
+from playlist_list_page import playlist_list_page
+import secrets
 
-from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
+app.secret_key = secrets.token_urlsafe(16)
 
-@app.route('/', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        return render_template('home.html')
-    return render_template('login.html')
+# Register blueprints
+app.register_blueprint(login_page, url_prefix='/')
+app.register_blueprint(sign_up_page, url_prefix='/signup')
+app.register_blueprint(home_page, url_prefix='/home')
+app.register_blueprint(playlist_list_page, url_prefix='/playlist_list')
 
-@app.route('/signup', methods=['GET', 'POST'])
-def signup():
-    if request.method == 'POST':
-        return render_template('home.html')
-    return render_template('signup.html')
-
-@app.route('/home')
-def home():
-    return render_template('home.html')
-
-@app.route('/playlists')
-def playlists():
-    return render_template('playlists.html')
 
 @app.route('/search')
 def search():
@@ -31,7 +24,7 @@ def search():
 def profile():
     return render_template('profile.html')
 
-@app.route('/likedsongs')
+@app.route('/likedsongs', endpoint='likedsongs')
 def likedsongs():
     return render_template('likedsongs.html')
 
