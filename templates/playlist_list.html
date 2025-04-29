@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Playlists</title>
+    <style>
+        /* Your CSS stays the same */
+    </style>
+</head>
+<body>
+
+    <h1>Playlists</h1>
+
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
+
+    <!-- Buttons to switch views -->
+    <form method="post" class="buttons">
+        <button type="submit" name="button_click" value="user_list">Your Playlists</button>
+        <button type="submit" name="button_click" value="top10_list">Top 10 Playlists</button>
+    </form>
+
+    <!-- Separate form to create playlist -->
+    <form method="post" class="buttons">
+        <label for="playlist_name">Enter Playlist Name:</label>
+        <input type="text" id="playlist_name" name="playlist_name" required>
+        <button type="submit" name="button_click" value="create_playlist">Create Playlist</button>
+    </form>
+
+    {% if playlists %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Playlist Name</th>
+                    <th>Author</th>
+                    {% if button_type.name == 'TOP10_LIST' %}
+                        <th>Number of Followers</th>
+                    {% endif %}
+                    <th>Submit</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for playlist in playlists %}
+                    <tr>
+                        {% if button_type.name == 'TOP10_LIST' %}
+                            <td>{{ playlist[2] }}</td>
+                            <td>{{ playlist[3] }}</td>
+                            <td>{{ playlist[1] }}</td>
+                        {% else %}
+                            <td>{{ playlist[1] }}</td>
+                            <td>{{ playlist[2] }}</td>
+                        {% endif %}
+                        <td>
+                            <form method="post" action="{{ url_for('playlist_list_page.playlist_select_handler') }}">
+                                <input type="hidden" name="playlist_select" value="{{ playlist[0] }}">
+                                <button type="submit" class="btn btn-primary btn-sm">Select Playlist</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No playlists found.</p>
+    {% endif %}
+
+</body>
+</html>

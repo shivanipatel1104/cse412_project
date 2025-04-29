@@ -4,7 +4,7 @@ import psycopg2
 
 playlist_page = Blueprint('playlist_page', __name__)
 
-@playlist_page.route('/playlist', methods=['GET', 'POST'])
+@playlist_page.route('/', methods=['GET', 'POST'])
 def playlist_info():
 	playlist_id = session.get('playlist_id')
 

@@ -6,8 +6,16 @@
 </head>
 <body class="bg-light">
     <div class="container py-5">
-        <h2 class="mb-4">Music Player: Home</h2> 
+        <h2 class="mb-4">Music Player: Home</h2>
+
+        <a href="{{ url_for('playlist_list_page.user_playlists') }}" class="btn btn-primary">
+            View Playlists
+        </a>
+
+        <a href="{{ url_for('search_page.song_search') }}" class="btn btn-primary">
+            Search for Songs
+        </a>
+
     </div>
-    
 </body>
-</html>
+</html
