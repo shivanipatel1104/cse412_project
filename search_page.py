@@ -27,7 +27,7 @@ def song_search():
                 # In case no songs match the user's search
                 if not songs:
                     message = "No songs found matching your search."
-                    return render_template('song_search.html', error=message)
+                    return render_template('search.html', error=message)
 
         except psycopg2.DatabaseError as e:
             message = f"Database error: {str(e)}"
