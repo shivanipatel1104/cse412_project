@@ -14,54 +14,38 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('home_page.home') }}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('search_page.song_search') }}">Search</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('playlist_list_page.user_playlists') }}">Playlists</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('liked_songs_page.liked_songs') }}">Liked Songs</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('profile_page.profile') }}">Profile</a>
-                    </li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('home_page.home') }}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('search_page.song_search') }}">Search</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('playlist_list_page.user_playlists') }}">Playlists</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('liked_songs_page.liked_songs') }}">Liked Songs</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('profile_page.profile') }}">Profile</a></li>
                 </ul>
             </div>
         </div>
     </nav>
 
-
     <div class="container py-5">
-        <h2 class="mb-4">Playlist List</h2> 
-    </div>
-
-    <div>
-        <h1>Playlists</h1>
+        <h2 class="mb-4">Playlists</h2> 
 
         {% if error %}
-            <p class="error">{{ error }}</p>
+            <div class="alert alert-danger">{{ error }}</div>
         {% endif %}
 
-       
-        <form method="post" class="buttons">
-            <a href="{{ url_for('playlist_page.playlist_info') }}" class="btn btn-primary">Your Playlists</a>
+        <form method="post" class="mb-3 d-flex gap-2 flex-wrap">
+            <a href="{{ url_for('playlist_list_page.user_playlists') }}" class="btn btn-primary">Your Playlists</a>
             <button type="submit" name="button_click" value="top10_list" class="btn btn-primary">Top 10 Playlists</button>
-            
         </form>
 
-        <!-- Separate form to create playlist -->
-        <form method="post" class="buttons">
-            <label for="playlist_name">Enter Playlist Name:</label>
-            <input type="text" id="playlist_name" name="playlist_name" class="form-control" required>
-            <button type="submit" name="button_click" value="create_playlist" class="btn btn-primary">Create Playlist</button>
+        <form method="post" class="mb-4">
+            <div class="mb-3">
+                <label for="playlist_name" class="form-label">Enter Playlist Name:</label>
+                <input type="text" id="playlist_name" name="playlist_name" class="form-control" required>
+            </div>
+            <button type="submit" name="button_click" value="create_playlist" class="btn btn-success">Create Playlist</button>
         </form>
 
         {% if playlists %}
-            <table>
+            <table class="table table-striped">
                 <thead>
                     <tr>
                         <th>Playlist Name</th>
@@ -69,7 +53,7 @@
                         {% if button_type.name == 'TOP10_LIST' %}
                             <th>Number of Followers</th>
                         {% endif %}
-                        <th>Submit</th>
+                        <th>   </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -86,7 +70,7 @@
                             <td>
                                 <form method="post" action="{{ url_for('playlist_list_page.playlist_select_handler') }}">
                                     <input type="hidden" name="playlist_select" value="{{ playlist[0] }}">
-                                    <button type="submit" class="btn btn-primary btn-sm">Select Playlist</button>
+                                    <button type="submit" class="btn btn-outline-primary btn-sm">View Playlist</button>
                                 </form>
                             </td>
                         </tr>
@@ -97,7 +81,6 @@
             <p>No playlists found.</p>
         {% endif %}
     </div>
-    
 
-
+</body>
 </html>
