@@ -4,6 +4,7 @@ import psycopg2
 
 liked_songs_page = Blueprint('liked_songs_page', __name__)
 
+# Selecting liked songs
 @liked_songs_page.route('/', methods=['GET'])
 def liked_songs():
 	try:
