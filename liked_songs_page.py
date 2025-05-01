@@ -19,8 +19,8 @@ def liked_songs():
 				FROM song
 				JOIN album ON s_albumID = al_albumID
 				JOIN artist ON al_artistID = a_artistID
-				JOIN liked_songs ON l_songID = s_songID
-				WHERE l_userID = %s
+				JOIN likedsongs ON l_songID = s_songID
+				WHERE l_userID = %s;
 			"""
 			cur.execute(query, (user_id,))
 			songs = cur.fetchall()

@@ -36,7 +36,37 @@
 
     <div class="container py-5">
         <h2 class="mb-4">Liked Songs</h2> 
+
+        {% if songs %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Song</th>
+                        <th>Artist</th>
+                        <th>Album</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for song in songs %}
+                        <tr>
+                            <td>{{ song[0] }}</td>
+                            <td>{{ song[2] }}</td>
+                            <td>{{ song[1] }}</td>
+                            
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No liked songs found.</p>
+        {% endif %}
+
     </div>
+
+   
+        
+
+    
     
 </body>
 </html>
