@@ -36,15 +36,55 @@
 
 
     <div class="container py-5">
-        <!-- <h2 class="mb-4">Playlists</h2>  -->
+        
+        <div class="container">
+            
+            {% if songs %}
+            <h1 class="mb-4">{{ playlist_name }}</h1>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Song Name</th>
+                        <th>Album</th>
+                        <th>Artist</th>
+                        <th>Genre</th>
+                        <th>Duration</th>
+                        <th>   </th>
+                        <th>   </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for song in songs %}
+                        <tr>
+                            <td>{{ song[0] }}</td>
+                            <td>{{ song[1] }}</td>
+                            <td>{{ song[2] }}</td>
+                            <td>{{ song[3] }}</td>
+                            <td>{{ song[4] }}</td>
+                            <td>
+                                <form method="post">
+                                    <input type="hidden" name="play_song">
+                                    <button type="submit" class="btn btn-outline-primary btn-sm">Play</button>
+                                </form>
+                            </td>
+                            <td>
+                                <form method="post">
+                                    <input type="hidden" name="like_song">
+                                    <button type="submit" class="btn btn-outline-primary btn-sm">Like</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No songs in playlist.</p>
+        {% endif %}
+
+    
+            <a href="{{ url_for('playlist_list_page.user_playlists') }}">← Back to your playlists</a>
+        </div>
     </div>
 
-    <div class="container">
-        <h1>Playlist Page</h1>
-        <p>Playlist ID: <strong>{{ playlist_id }}</strong></p>
-
-        <p>This is a placeholder page. More playlist details will be shown here soon!</p>
-
-        <a href="{{ url_for('playlist_list_page.user_playlists') }}">← Back to your playlists</a>
-    </div>
+    
     

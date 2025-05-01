@@ -15,9 +15,11 @@ def song_search():
 
                 # I used ILIKE for case insensitive text based matching
                 query = """
-                    SELECT s_songname, s_albumid, s_genre, duration
-                    FROM song
-                    WHERE s_songname ILIKE %s
+                    SELECT s_songname, al_albumName, a_artistName, s_genre, duration
+                    FROM song 
+					JOIN album ON s_albumID = al_albumID
+                    JOIN artist ON al_artistID = a_artistID
+                    WHERE s_songname ILIKE %s;
                 """
                 # applying % to beginning and end to make user error
                 # more forgiving in case of typos and to easier

@@ -23,9 +23,6 @@ def user_playlists():
     button_type = PlaylistType.USER_LIST # user list is default
 
     # fetch user id for current user from session
-    # curr_user_id = session.get('user_id')
-    # if not curr_user_id:
-    #     return redirect(url_for('login_page.login'))
     curr_user_id = session['user_id']
     if not curr_user_id:
         return render_template('playlist_list.html', error='User session credentials are not authorized')

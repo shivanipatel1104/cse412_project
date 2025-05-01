@@ -13,6 +13,7 @@ def playlist_info():
     playlist_id = session.get('playlist_id')
     user_id = session.get('user_id')
     is_followed = False # default to false, will query later
+    playlist_name = None
 
     if not playlist_id:
         return render_template('playlist.html', error="Error with session playlist id")
@@ -21,10 +22,14 @@ def playlist_info():
         conn = get_db_connection()
 
         with conn.cursor() as cur:
+            cur.execute("SELECT p_playlistname FROM playlist WHERE p_playlistID = %s", (playlist_id,))
+            row = cur.fetchone()
+            playlist_name = row[0] if row else "Untitled Playlist"
+
             # Show song name, album name, and artist name for
             # each song in the playlist (IDed by playlist_id)
             query = """
-                SELECT s_songname, al_albumName, a_artistName
+                SELECT s_songname, al_albumName, a_artistName, s_genre, duration
                 FROM playlistsongs
                 JOIN playlist ON p_playlistID = ps_playlistID
                 JOIN song ON s_songID = ps_songID
@@ -59,7 +64,7 @@ def playlist_info():
     finally:
         conn.close()
 
-    return render_template('playlist.html', songs=songs, is_followed=is_followed)
+    return render_template('playlist.html', songs=songs, is_followed=is_followed, playlist_name=playlist_name)
 
 @playlist_page.route('/delete_song', methods=['POST'])
 def delete_playlist_song():
