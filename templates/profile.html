@@ -6,40 +6,54 @@
 </head>
 <body class="bg-light">
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-            <a class="navbar-brand">Music Player</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('home_page.home') }}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('search_page.song_search') }}">Search</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('playlist_list_page.user_playlists') }}">Playlists</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('liked_songs_page.liked_songs') }}">Liked Songs</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('profile_page.profile') }}">Profile</a>
-                    </li>
-                </ul>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand">Music Player</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('home_page.home') }}">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('search_page.song_search') }}">Search</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('playlist_list_page.user_playlists') }}">Playlists</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('liked_songs_page.liked_songs') }}">Liked Songs</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('profile_page.profile') }}">Profile</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6 text-center bg-white p-4 rounded shadow-sm  mb-3">
+
+            <h1 class="mb-4">Your Profile</h1>
+
+            {% if error %}
+                <p class="text-danger">{{ error }}</p>
+            {% elif message %}
+                <p class="text-danger">{{ message }}</p>
+            {% endif %}
+
+            {% if user_info %}
+                <p><strong>Name:</strong> {{ user_info[1] }}</p>
+                <p><strong>Email:</strong> {{ user_info[2] }}</p>
+                <p><strong>Username:</strong> {{ user_info[0] }}</p>
+            {% endif %}
+
+            <button onclick="document.getElementById('password-form').style.display='block'" class="btn btn-primary mt-3">Change Password</button>
+
+            <div id="password-form" style="display: none; margin-top: 10px;">
+                <form method="POST">
+                    <input type="password" name="new_password" placeholder="Enter new password" class="form-control my-2" required>
+                    <button type="submit" class="btn btn-primary">Change</button>
+                </form>
             </div>
         </div>
-    </nav>
-
-
-    <div class="container py-5">
-        <h2 class="mb-4">Profile</h2> 
+        <button type="submit" class="btn btn-primary">Logout</button>
     </div>
+</div>
 
-    
-    
 </body>
 </html>

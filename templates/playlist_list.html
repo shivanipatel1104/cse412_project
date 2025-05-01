@@ -18,16 +18,16 @@
                         <a class="nav-link" href="{{ url_for('home_page.home') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('search') }}">Search</a>
+                        <a class="nav-link" href="{{ url_for('search_page.song_search') }}">Search</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('playlist_list_page.user_playlists') }}">Playlists</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('likedsongs') }}">Liked Songs</a>
+                        <a class="nav-link" href="{{ url_for('liked_songs_page.liked_songs') }}">Liked Songs</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('profile') }}">Profile</a>
+                        <a class="nav-link" href="{{ url_for('profile_page.profile') }}">Profile</a>
                     </li>
                 </ul>
             </div>
@@ -56,7 +56,7 @@
         <!-- Separate form to create playlist -->
         <form method="post" class="buttons">
             <label for="playlist_name">Enter Playlist Name:</label>
-            <input type="text" id="playlist_name" name="playlist_name" required>
+            <input type="text" id="playlist_name" name="playlist_name" class="form-control" required>
             <button type="submit" name="button_click" value="create_playlist" class="btn btn-primary">Create Playlist</button>
         </form>
 

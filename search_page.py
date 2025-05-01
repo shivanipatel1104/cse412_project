@@ -4,6 +4,7 @@ import psycopg2
 
 search_page = Blueprint('search_page', __name__)
 
+# Shows results of searched song name with some pattern matching
 @search_page.route('/', methods=['GET', 'POST'])
 def song_search():
     if request.method == 'POST':
@@ -40,3 +41,21 @@ def song_search():
         return render_template('search.html', songs=songs)
 
     return render_template('search.html') 
+
+# Handle song selection functionality
+@search_page.route('/', methods=['POST'])
+def song_select_handler():
+    try:
+        song_id = request.form.get("song_select")
+
+        if not song_id:
+            raise Exception("Invalid song selected")
+
+        session['song_id'] = song_id
+        return redirect(url_for('song_page.song_info'))
+
+    except Exception as e:
+        mess = f'Error when handling request: {str(e)}'
+        return render_template('search.html', error=mess)
+
+

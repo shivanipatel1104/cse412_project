@@ -23,9 +23,12 @@ def user_playlists():
     button_type = PlaylistType.USER_LIST # user list is default
 
     # fetch user id for current user from session
-    curr_user_id = session.get('user_id')
+    # curr_user_id = session.get('user_id')
+    # if not curr_user_id:
+    #     return redirect(url_for('login_page.login'))
+    curr_user_id = session['user_id']
     if not curr_user_id:
-        return redirect(url_for('login_page.login'))
+        return render_template('playlist_list.html', error='User session credentials are not authorized')
     try:
         conn = get_db_connection()
 
@@ -38,32 +41,14 @@ def user_playlists():
                 except ValueError:
                     button_type = PlaylistType.USER_LIST # use default case in case of unknown behavior
 
-            if button_type == PlaylistType.TOP10_LIST:
-                query = """
-                    -- Show top n most followed playlists
-                    SELECT p_playlistID, 
-                           COUNT(pf_playlistID) AS num_follows, 
-                           p_playlistname, 
-                           u_username -- username for author of playlist
-                    FROM playlist
-                    JOIN users ON p_author_userid = u_userID
-                    JOIN playlist_followers ON pf_playlistID = p_playlistID
-                    GROUP BY p_playlistID, p_playlistname, u_username
-                    ORDER BY num_follows DESC -- descending to get the most followed playlists first
-                    LIMIT 10; -- replace 10 with the number of top playlists to show
-                """
-
-                cur.execute(query)
-                playlists = cur.fetchall()
-
             # button for creating a playlist
-            elif button_type == PlaylistType.CREATE_PLAYLIST:
+            if button_type == PlaylistType.CREATE_PLAYLIST:
                 playlist_name = request.form.get("playlist_name")
                 author_id = session.get('user_id') # author of playlist is current user
                 time_created = datetime.now()
 
                 if not playlist_name:
-                    raise Exception("Playlist name required")
+                    return render_template('playlist_list.handling', error="Playlist name required")
 
                 playlist_query = """
                     INSERT INTO playlist (p_playlistname, p_author_userid, p_timecreated)
@@ -88,9 +73,28 @@ def user_playlists():
                 cur.execute(get_playlist_id_query, (playlist_name, author_id))
                 playlist_id_data = cur.fetchone()
 
-                cur.execute(playlist_follower_query, (playlist_id_data, author_id))
+                playlist_id = playlist_id_data[0]
+
+                cur.execute(playlist_follower_query, (playlist_id, author_id))
                 conn.commit()
 
+            if button_type == PlaylistType.TOP10_LIST:
+                query = """
+                    -- Show top n most followed playlists
+                    SELECT p_playlistID, 
+                           COUNT(pf_playlistID) AS num_follows, 
+                           p_playlistname, 
+                           u_username -- username for author of playlist
+                    FROM playlist
+                    JOIN users ON p_author_userid = u_userID
+                    JOIN playlist_followers ON pf_playlistID = p_playlistID
+                    GROUP BY p_playlistID, p_playlistname, u_username
+                    ORDER BY num_follows DESC -- descending to get the most followed playlists first
+                    LIMIT 10; -- replace 10 with the number of top playlists to show
+                """
+
+                cur.execute(query)
+                playlists = cur.fetchall()
             else: 
                 query = """
                     -- Select all playlists a user is following (show playlist name and playlist author name)
@@ -114,6 +118,7 @@ def user_playlists():
     #Using button_type parameter for easier rendering of correct list
     return render_template('playlist_list.html', playlists=playlists, button_type=button_type)
 
+# For selecting a playlist and going to that playlist page
 @playlist_list_page.route('/select_playlist', methods=['POST'])
 def playlist_select_handler():
     try:
@@ -123,13 +128,55 @@ def playlist_select_handler():
             raise Exception("Invalid playlist selected")
 
         session['playlist_id'] = playlist_id
-        return redirect(url_for('playlist_page.playlist_info'))
-
-    except psycopg2.DatabaseError as e:
-        message = f"Database error: {str(e)}"
-        return render_template('playlist_list.html', error=message)         
+        return redirect(url_for('playlist_page.playlist_info'))        
 
     except Exception as e:
         message = f'Error when handling request: {str(e)}'
         return render_template('playlist_list.html', error=message)
 
+# Delete button needed for deleting playlist from user playlist section
+@playlist_list_page.route('/delete_playlist', methods=['POST'])
+def delete_playlist():
+    try:
+        playlist_id = session.get('playlist_id')
+        curr_user_id = session.get('user_id')  # Define curr_user_id from the session
+
+        if not playlist_id:
+            return render_template('playlist_list.html', error="Error with session playlist id")
+
+        if not curr_user_id:  # Check if current user ID exists in session
+            return render_template('playlist_list.html', error="Error with session user id")
+
+        if request.form.get('playlist_delete'):
+            conn = get_db_connection()
+            with conn:
+                with conn.cursor() as cur:
+                    # Delete the playlist
+                    query = """
+                        DELETE FROM playlist
+                        WHERE p_playlistID = %s
+                    """
+                    cur.execute(query, (playlist_id,))
+
+                    message = 'Playlist successfully deleted!'
+
+                    # Select all playlists a user is following
+                    query = """
+                        SELECT p_playlistID, p_playlistname, u_username
+                        FROM playlist
+                        JOIN playlist_followers ON pf_playlistID = p_playlistID
+                        JOIN user ON p_author_userid = u_userID
+                        WHERE pf_userID = %s;
+                    """
+                    cur.execute(query, (curr_user_id,))
+                    playlists = cur.fetchall()
+
+                    return render_template('playlist_list.html', message=message, playlists=playlists)
+
+    except psycopg2.DatabaseError as e:
+        message = f"Database error: {str(e)}"
+        return render_template('playlist_list.html', error=message)
+
+    except Exception as e:
+        message = f'Error when handling request: {str(e)}'
+        return render_template('playlist_list.html', error=message)

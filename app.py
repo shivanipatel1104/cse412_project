@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask
 from login_page import login_page
 from sign_up_page import sign_up_page
 from home_page import home_page
@@ -22,19 +22,6 @@ app.register_blueprint(playlist_page, url_prefix='/playlist')
 app.register_blueprint(search_page, url_prefix='/search')
 app.register_blueprint(liked_songs_page, url_prefix='/liked_songs')
 app.register_blueprint(profile_page, url_prefix='/profile')
-
-
-@app.route('/search')
-def search():
-    return render_template('search.html')
-
-@app.route('/profile')
-def profile():
-    return render_template('profile.html')
-
-@app.route('/likedsongs', endpoint='likedsongs')
-def likedsongs():
-    return render_template('likedsongs.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
