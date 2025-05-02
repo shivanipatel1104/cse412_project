@@ -44,14 +44,21 @@
                         <th>Song</th>
                         <th>Artist</th>
                         <th>Album</th>
+                        <th> </th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for song in songs %}
                         <tr>
-                            <td>{{ song[0] }}</td>
-                            <td>{{ song[2] }}</td>
                             <td>{{ song[1] }}</td>
+                            <td>{{ song[3] }}</td>
+                            <td>{{ song[2] }}</td>
+                            <td>
+                                <form method="post" action="{{ url_for('liked_songs_page.delete_liked_song') }}">
+                                    <input type="hidden" name="liked_song" value="{{ song[0] }}">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                                </form>
+                            </td>
                             
                         </tr>
                     {% endfor %}
