@@ -14,6 +14,7 @@ def playlist_info():
     is_followed = False
 
     song_played_message = session.get('song_played_message')
+    song_liked_message = session.get('song_liked_message')
 
     if not playlist_id:
         return render_template('playlist.html', error="Error with session playlist id")
@@ -61,7 +62,7 @@ def playlist_info():
     finally:
         conn.close()
 
-    return render_template('playlist.html', songs=songs, is_followed=is_followed, playlist_name=playlist_name, song_played_message=song_played_message)
+    return render_template('playlist.html', songs=songs, is_followed=is_followed, playlist_name=playlist_name, song_played_message=song_played_message, song_liked_message=song_liked_message)
 
 
 @playlist_page.route('/delete_song', methods=['POST'])
@@ -83,8 +84,6 @@ def delete_playlist_song():
                 cur.execute(query, (playlist_id, song_id))
                 message = "Song was successfully removed from playlist!"
 
-                return render_template('playlist.html', message=message)
-
     except psycopg2.DatabaseError as e:
         message = f"Database error: {str(e)}"
         return render_template('playlist.html', error=message)
@@ -92,6 +91,8 @@ def delete_playlist_song():
     except Exception as e:
         message = f'Error when handling request: {str(e)}'
         return render_template('playlist.html', error=message)
+
+    return redirect(url_for('playlist_page.playlist_info'))
 
 
 # Allow user to follow playlist or unfollow if they already are following
@@ -161,8 +162,6 @@ def song_play_handler():
                     WHERE s_songID = %s
                 """
                 cur.execute(query, (song_id,)) 
-                print(f"Executing query: {query} with song_id {song_id}")
-                conn.commit()
 
                 query = 'SELECT s_songname, s_times_played FROM song WHERE s_songID = %s'
                 cur.execute(query, (song_id,))
@@ -175,10 +174,94 @@ def song_play_handler():
 
     except psycopg2.DatabaseError as e:
         message = f"Database error: {str(e)}"
-        return render_template('playlist_list.html', error=message)
+        return render_template('playlist.html', error=message)
 
     except Exception as e:
         message = f'Error when handling request: {str(e)}'
-        return render_template('playlist_list.html', error=message)
+        return render_template('playlist.html', error=message)
+
+    return redirect(url_for('playlist_page.playlist_info'))
+
+# Handle liking song
+@playlist_page.route('/like', methods = ['POST'])
+def like_song_handler():
+    try:
+        song_id = request.form.get('like_song')
+        user_id = session.get('user_id')
+
+        if not song_id:
+            return render_template('playlist.html', error="Error: No song session id")
+
+        if not user_id:
+            return render_template('playlist.html', error="Error: No user session id")
+
+        conn = get_db_connection()
+        with conn:
+            with conn.cursor() as cur:
+                # Get song name
+                song_name_query = 'SELECT s_songname FROM song WHERE s_songID = %s'
+                cur.execute(song_name_query, (song_id,))
+                result = cur.fetchone()
+
+                if result:
+                    song_name = result[0]
+
+                else:
+                    mess = 'Error: song id does not exist'
+                    return render_template('playlist.html', error=mess)
+
+                # Checking if song is in user's liked songs
+                query = """
+                    SELECT *
+                    FROM likedsongs
+                    WHERE l_userID = %s AND l_songID = %s
+                """
+                cur.execute(query, (user_id, song_id))
+                is_liked = cur.fetchone()
+
+                # If is in user's liked songs, then remove it
+                if is_liked:
+                    message = f"{song_name} removed from liked songs!"
+                    query = """
+                        DELETE FROM likedsongs
+                        WHERE l_userID = %s AND l_songID = %s 
+                    """
+                    cur.execute(query, (user_id, song_id))
+
+                # If not in user's liked songs, then add it
+                else:
+                    message = f"{song_name} added to liked songs!"
+                    query = """
+                        INSERT INTO likedsongs (l_userID, l_songID)
+                        VALUES (%s, %s)
+                    """
+                    cur.execute(query, (user_id, song_id))
+                
+
+                # Fetch song data for message
+                song_data_query = """
+                    SELECT s_songname
+                    FROM song
+                    WHERE s_songID = %s
+                """
+                cur.execute(song_data_query, (song_id,))
+
+                result = cur.fetchone()
+
+                if result:
+                    song_name = result[0]
+
+                else:
+                    return render_template('playlist.html', error='Unknown song name')
+                
+                session['song_liked_message'] = message
+
+    except psycopg2.DatabaseError as e:
+        message = f"Database error: {str(e)}"
+        return render_template('playlist.html', error=message)
+
+    except Exception as e:
+        message = f'Error when handling request: {str(e)}'
+        return render_template('playlist.html', error=message)
 
     return redirect(url_for('playlist_page.playlist_info'))

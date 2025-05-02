@@ -33,6 +33,13 @@
             </div>
         {% endif %}
 
+        <!-- song liked message -->
+        {% if song_liked_message %}For 
+            <div class="alert alert-success" role="alert">
+                {{ song_liked_message }}
+            </div>
+        {% endif %}
+
         {% if error %}
             <div class="alert alert-danger">{{ error }}</div>
         {% elif message %}
@@ -92,7 +99,7 @@
 
                             <!-- Like button -->
                             <td>
-                                <form method="post">
+                                <form method="post" action="{{ url_for('playlist_page.like_song_handler') }}">
                                     <input type="hidden" name="like_song" value="{{ song[0] }}">
                                     <button type="submit" class="btn btn-outline-success btn-sm">Like</button>
                                 </form>
