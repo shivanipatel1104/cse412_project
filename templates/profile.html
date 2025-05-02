@@ -26,8 +26,7 @@
 
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6 text-center bg-white p-4 rounded shadow-sm  mb-3">
-
+        <div class="col-md-8 col-lg-6 text-center bg-white p-4 rounded shadow-sm mb-3">
             <h1 class="mb-4">Your Profile</h1>
 
             {% if error %}
@@ -45,13 +44,19 @@
             <button onclick="document.getElementById('password-form').style.display='block'" class="btn btn-primary mt-3">Change Password</button>
 
             <div id="password-form" style="display: none; margin-top: 10px;">
-                <form method="POST">
+                <form method="POST" action="/profile/change_password">
                     <input type="password" name="new_password" placeholder="Enter new password" class="form-control my-2" required>
                     <button type="submit" class="btn btn-primary">Change</button>
                 </form>
             </div>
         </div>
-        <button type="submit" class="btn btn-primary">Logout</button>
+
+        <!-- Centered Logout Button Form -->
+        <div class="col-12 text-center">
+            <form method="POST" action="/profile/logout">
+                <button type="submit" class="btn btn-primary">Logout</button>
+            </form>
+        </div>
     </div>
 </div>
 

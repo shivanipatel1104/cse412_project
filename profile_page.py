@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from database import get_db_connection
 import psycopg2
 
@@ -41,4 +41,35 @@ def profile():
 
     return render_template('profile.html', user_info=user_info)
 
-# TODO: ADD options to update password or name (NOT USERNAME)
+# option to update password
+@profile_page.route('/change_password', methods=['POST'])
+def change_password():
+    try:
+        user_id = session.get('user_id')
+        new_password = request.form.get("new_password")
+        if not new_password:
+            return render_template('profile.html', error='Password field required')
+
+        conn = get_db_connection()
+        with conn.cursor() as cur:
+            query = """
+                UPDATE users 
+                SET u_password = %s 
+                WHERE u_userID = %s
+            """
+            cur.execute(query, (new_password, user_id))
+            conn.commit()
+
+    except Exception as e:
+        return render_template('profile.html', error = f'Error: {str(e)}')
+
+    finally:
+        conn.close()
+
+    flash('Password was successfully changed!')
+    return redirect(url_for('profile_page.profile'))
+
+@profile_page.route('/logout', methods=['POST'])
+def logout():
+    session.clear()
+    return redirect(url_for('login_page.login'))

@@ -9,40 +9,64 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
             <a class="navbar-brand">Music Player</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('home_page.home') }}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('search_page.song_search') }}">Search</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('playlist_list_page.user_playlists') }}">Playlists</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('liked_songs_page.liked_songs') }}">Liked Songs</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('profile_page.profile') }}">Profile</a>
-                    </li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('home_page.home') }}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('search_page.song_search') }}">Search</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('playlist_list_page.user_playlists') }}">Playlists</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('liked_songs_page.liked_songs') }}">Liked Songs</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('profile_page.profile') }}">Profile</a></li>
                 </ul>
             </div>
         </div>
     </nav>
 
-
     <div class="container py-5">
-        
-        <div class="container">
-            
-            {% if songs %}
+        <!-- song played message -->
+        {% if song_played_message %}
+            <div class="alert alert-info" role="alert">
+                {{ song_played_message }}
+            </div>
+        {% endif %}
+
+        <!-- song liked message -->
+        {% if song_liked_message %}For 
+            <div class="alert alert-success" role="alert">
+                {{ song_liked_message }}
+            </div>
+        {% endif %}
+
+        {% if error %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% elif message %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% endif %}
+
+        {% if songs %}
             <h1 class="mb-4">{{ playlist_name }}</h1>
-            <button type="submit" class="btn btn-outline-primary btn-sm mb-4" action="{{ url_for('playlist_page.follow_or_unfollow_playlist') }}">Follow Playlist</button>
-            <button type="submit" class="btn btn-outline-primary btn-sm mb-4">Like Playlist</button>
+
+            <!-- Follow/Unfollow Button -->
+            <form method="post" action="{{ url_for('playlist_page.follow_or_unfollow_playlist') }}">
+                <button type="submit" class="btn btn-sm mb-4 
+                    {% if is_followed %}
+                        btn-primary
+                    {% else %}
+                        btn-outline-primary
+                    {% endif %}
+                ">
+                    {% if is_followed %}
+                        Followed
+                    {% else %}
+                        Follow Playlist
+                    {% endif %}
+                </button>
+            </form>
+
+            <!-- Songs Table -->
             <table class="table table-striped">
                 <thead>
                     <tr>
@@ -51,28 +75,41 @@
                         <th>Artist</th>
                         <th>Genre</th>
                         <th>Duration</th>
-                        <th>   </th>
-                        <th>   </th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for song in songs %}
                         <tr>
-                            <td>{{ song[0] }}</td>
                             <td>{{ song[1] }}</td>
                             <td>{{ song[2] }}</td>
                             <td>{{ song[3] }}</td>
                             <td>{{ song[4] }}</td>
+                            <td>{{ song[5] }}</td>
+
+                            <!-- Play button -->
                             <td>
-                                <form method="post">
-                                    <input type="hidden" name="play_song">
+                                <form method="post" action="{{ url_for('playlist_page.song_play_handler') }}">
+                                    <input type="hidden" name="song_id" value="{{ song[0] }}">
                                     <button type="submit" class="btn btn-outline-primary btn-sm">Play</button>
                                 </form>
                             </td>
+
+                            <!-- Like button -->
                             <td>
-                                <form method="post">
-                                    <input type="hidden" name="like_song">
-                                    <button type="submit" class="btn btn-outline-primary btn-sm">Like</button>
+                                <form method="post" action="{{ url_for('playlist_page.like_song_handler') }}">
+                                    <input type="hidden" name="like_song" value="{{ song[0] }}">
+                                    <button type="submit" class="btn btn-outline-success btn-sm">Like</button>
+                                </form>
+                            </td>
+
+                            <!-- Delete button -->
+                            <td>
+                                <form method="post" action="{{ url_for('playlist_page.delete_playlist_song') }}">
+                                    <input type="hidden" name="song_delete" value="{{ song[0] }}">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
                                 </form>
                             </td>
                         </tr>
@@ -83,10 +120,8 @@
             <p>No songs in playlist.</p>
         {% endif %}
 
-    
-            <a href="{{ url_for('playlist_list_page.user_playlists') }}">← Back to your playlists</a>
-        </div>
+        <a href="{{ url_for('playlist_list_page.user_playlists') }}">← Back to your playlists</a>
     </div>
 
-    
-    
+</body>
+</html>

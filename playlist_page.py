@@ -5,15 +5,16 @@ import psycopg2
 playlist_page = Blueprint('playlist_page', __name__)
 
 # Show songs in user playlist. Also is_followed functionality:
-# If user follows playlist, then set if_followed to true, else false
-# if_followed is for changing status of 'followed button'. I.E. the 'followed button' text
-# could be 'followed' if is_followed is true and 'unfollowed' if is_followed is false
+# If user follows playlist, then set is_followed to True, else False.
+# is_followed is for changing status of 'followed' button (i.e., toggle between 'followed' and 'unfollowed').
 @playlist_page.route('/', methods=['GET'])
 def playlist_info():
     playlist_id = session.get('playlist_id')
     user_id = session.get('user_id')
-    is_followed = False # default to false, will query later
-    playlist_name = None
+    is_followed = False
+
+    song_played_message = session.get('song_played_message')
+    song_liked_message = session.get('song_liked_message')
 
     if not playlist_id:
         return render_template('playlist.html', error="Error with session playlist id")
@@ -26,10 +27,9 @@ def playlist_info():
             row = cur.fetchone()
             playlist_name = row[0] if row else "Untitled Playlist"
 
-            # Show song name, album name, and artist name for
-            # each song in the playlist (IDed by playlist_id)
+            # Show song name, album name, and artist name for each song in the playlist
             query = """
-                SELECT s_songname, al_albumName, a_artistName, s_genre, duration
+                SELECT s_songID, s_songname, al_albumName, a_artistName, s_genre, duration
                 FROM playlistsongs
                 JOIN playlist ON p_playlistID = ps_playlistID
                 JOIN song ON s_songID = ps_songID
@@ -48,8 +48,6 @@ def playlist_info():
                 )
             """
             cur.execute(check_followed, (playlist_id, user_id))
-
-            # If user follows playlist
             result = cur.fetchone()
             is_followed = result[0]
 
@@ -64,7 +62,8 @@ def playlist_info():
     finally:
         conn.close()
 
-    return render_template('playlist.html', songs=songs, is_followed=is_followed, playlist_name=playlist_name)
+    return render_template('playlist.html', songs=songs, is_followed=is_followed, playlist_name=playlist_name, song_played_message=song_played_message, song_liked_message=song_liked_message)
+
 
 @playlist_page.route('/delete_song', methods=['POST'])
 def delete_playlist_song():
@@ -85,8 +84,6 @@ def delete_playlist_song():
                 cur.execute(query, (playlist_id, song_id))
                 message = "Song was successfully removed from playlist!"
 
-                return render_template('playlist.html', message=message)
-
     except psycopg2.DatabaseError as e:
         message = f"Database error: {str(e)}"
         return render_template('playlist.html', error=message)
@@ -95,9 +92,12 @@ def delete_playlist_song():
         message = f'Error when handling request: {str(e)}'
         return render_template('playlist.html', error=message)
 
+    return redirect(url_for('playlist_page.playlist_info'))
+
+
 # Allow user to follow playlist or unfollow if they already are following
 @playlist_page.route('/follow_playlist', methods=['POST'])
-def follow_or_unfollow_playlist():  # <-- You were missing this function definition
+def follow_or_unfollow_playlist():
     try:
         playlist_id = session.get('playlist_id')
         user_id = session.get('user_id')
@@ -107,7 +107,7 @@ def follow_or_unfollow_playlist():  # <-- You were missing this function definit
 
         conn = get_db_connection()
         with conn:
-            with conn.cursor() as cur:  # typo: you had `con.cursor()` instead of `conn.cursor()`
+            with conn.cursor() as cur:
                 query = """
                     SELECT pf_playlistID
                     FROM playlist_followers
@@ -117,7 +117,7 @@ def follow_or_unfollow_playlist():  # <-- You were missing this function definit
                 is_followed = cur.fetchone()
 
                 if is_followed:
-                    # remove from followed
+                    # Remove from followed
                     remove_follow = """
                         DELETE FROM playlist_followers
                         WHERE pf_playlistID = %s AND pf_userID = %s
@@ -125,7 +125,7 @@ def follow_or_unfollow_playlist():  # <-- You were missing this function definit
                     cur.execute(remove_follow, (playlist_id, user_id))
                     message = 'Playlist successfully removed from your follow list'
                 else:
-                    # add to followed
+                    # Add to followed
                     add_follow = """
                         INSERT INTO playlist_followers (pf_playlistID, pf_userID)
                         VALUES (%s, %s)
@@ -133,7 +133,7 @@ def follow_or_unfollow_playlist():  # <-- You were missing this function definit
                     cur.execute(add_follow, (playlist_id, user_id))
                     message = 'Playlist successfully added to your follow list!'
 
-                return render_template('playlist.html', message=message)
+                return redirect(url_for('playlist_page.playlist_info'))
 
     except psycopg2.DatabaseError as e:
         message = f"Database error: {str(e)}"
@@ -142,3 +142,126 @@ def follow_or_unfollow_playlist():  # <-- You were missing this function definit
     except Exception as e:
         message = f'Error when handling request: {str(e)}'
         return render_template('playlist.html', error=message)
+
+# Handle song being played (play button being clicked)
+@playlist_page.route('/play', methods=['POST'])
+def song_play_handler():
+    try:
+        song_id = request.form.get('song_id')
+
+        if not song_id:
+            return render_template('playlist.html', error='Error retrieving song id')
+
+        # Connect to the database
+        conn = get_db_connection()
+        with conn:
+            with conn.cursor() as cur:
+                query = """
+                    UPDATE song
+                    SET s_times_played = s_times_played + 1
+                    WHERE s_songID = %s
+                """
+                cur.execute(query, (song_id,)) 
+
+                query = 'SELECT s_songname, s_times_played FROM song WHERE s_songID = %s'
+                cur.execute(query, (song_id,))
+
+                result = cur.fetchone()
+                song_name = result[0]
+                times_played = result[1]
+
+        session['song_played_message'] = f'{song_name} was successfully played! You have played this song {times_played} times!'
+
+    except psycopg2.DatabaseError as e:
+        message = f"Database error: {str(e)}"
+        return render_template('playlist.html', error=message)
+
+    except Exception as e:
+        message = f'Error when handling request: {str(e)}'
+        return render_template('playlist.html', error=message)
+
+    return redirect(url_for('playlist_page.playlist_info'))
+
+# Handle liking song
+@playlist_page.route('/like', methods = ['POST'])
+def like_song_handler():
+    try:
+        song_id = request.form.get('like_song')
+        user_id = session.get('user_id')
+
+        if not song_id:
+            return render_template('playlist.html', error="Error: No song session id")
+
+        if not user_id:
+            return render_template('playlist.html', error="Error: No user session id")
+
+        conn = get_db_connection()
+        with conn:
+            with conn.cursor() as cur:
+                # Get song name
+                song_name_query = 'SELECT s_songname FROM song WHERE s_songID = %s'
+                cur.execute(song_name_query, (song_id,))
+                result = cur.fetchone()
+
+                if result:
+                    song_name = result[0]
+
+                else:
+                    mess = 'Error: song id does not exist'
+                    return render_template('playlist.html', error=mess)
+
+                # Checking if song is in user's liked songs
+                query = """
+                    SELECT *
+                    FROM likedsongs
+                    WHERE l_userID = %s AND l_songID = %s
+                """
+                cur.execute(query, (user_id, song_id))
+                is_liked = cur.fetchone()
+
+                # If is in user's liked songs, then remove it
+                if is_liked:
+                    message = f"{song_name} removed from liked songs!"
+                    query = """
+                        DELETE FROM likedsongs
+                        WHERE l_userID = %s AND l_songID = %s 
+                    """
+                    cur.execute(query, (user_id, song_id))
+
+                # If not in user's liked songs, then add it
+                else:
+                    message = f"{song_name} added to liked songs!"
+                    query = """
+                        INSERT INTO likedsongs (l_userID, l_songID)
+                        VALUES (%s, %s)
+                    """
+                    cur.execute(query, (user_id, song_id))
+                
+
+                # Fetch song data for message
+                song_data_query = """
+                    SELECT s_songname
+                    FROM song
+                    WHERE s_songID = %s
+                """
+                cur.execute(song_data_query, (song_id,))
+
+                result = cur.fetchone()
+
+                if result:
+                    song_name = result[0]
+
+                else:
+                    return render_template('playlist.html', error='Unknown song name')
+                
+                session['song_liked_message'] = message
+
+    except psycopg2.DatabaseError as e:
+        message = f"Database error: {str(e)}"
+        return render_template('playlist.html', error=message)
+
+    except Exception as e:
+        message = f'Error when handling request: {str(e)}'
+        return render_template('playlist.html', error=message)
+
+    return redirect(url_for('playlist_page.playlist_info'))

@@ -30,8 +30,4 @@ def login():
             message = f'Error when handling request: {str(e)}'
             return render_template('login.html', error=message)
 
-        finally:
-            if conn:
-                conn.close()
-
     return render_template('login.html')

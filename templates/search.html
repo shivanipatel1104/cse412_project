@@ -70,7 +70,7 @@
                         <td>{{ song[4] }}</td>
                         <td>{{ song[5] }}</td>
                         <td>
-                            <form method="post">
+                            <form method="post" action="{{ url_for('search_page.add_to_playlist') }}">
                                 <input type="hidden" name="song_id" value="{{ song[0] }}">
                                 <button type="submit" name="action" value="select_playlist" class="btn btn-outline-primary btn-sm">Add to Playlist</button>
                             </form>   
