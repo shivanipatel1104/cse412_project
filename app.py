@@ -11,7 +11,8 @@ import secrets
 
 
 app = Flask(__name__)
-app.secret_key = secrets.token_urlsafe(16)
+# app.secret_key = 'secrets.token_urlsafe(16)'
+app.secret_key = '1234'
 
 # Register blueprints
 app.register_blueprint(login_page, url_prefix='/')

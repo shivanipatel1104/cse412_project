@@ -5,15 +5,18 @@ import psycopg2
 playlist_page = Blueprint('playlist_page', __name__)
 
 # Show songs in user playlist. Also is_followed functionality:
-# If user follows playlist, then set if_followed to true, else false
-# if_followed is for changing status of 'followed button'. I.E. the 'followed button' text
-# could be 'followed' if is_followed is true and 'unfollowed' if is_followed is false
+# If user follows playlist, then set is_followed to True, else False.
+# is_followed is for changing status of 'followed' button (i.e., toggle between 'followed' and 'unfollowed').
 @playlist_page.route('/', methods=['GET'])
 def playlist_info():
     playlist_id = session.get('playlist_id')
     user_id = session.get('user_id')
+<<<<<<< HEAD
     is_followed = False # default to false, will query later
     playlist_name = None
+=======
+    is_followed = False  # default to False, will query later
+>>>>>>> 5fcddc5 (Fixed formatting bug in playlist page python file)
 
     if not playlist_id:
         return render_template('playlist.html', error="Error with session playlist id")
@@ -22,12 +25,16 @@ def playlist_info():
         conn = get_db_connection()
 
         with conn.cursor() as cur:
+<<<<<<< HEAD
             cur.execute("SELECT p_playlistname FROM playlist WHERE p_playlistID = %s", (playlist_id,))
             row = cur.fetchone()
             playlist_name = row[0] if row else "Untitled Playlist"
 
             # Show song name, album name, and artist name for
             # each song in the playlist (IDed by playlist_id)
+=======
+            # Show song name, album name, and artist name for each song in the playlist
+>>>>>>> 5fcddc5 (Fixed formatting bug in playlist page python file)
             query = """
                 SELECT s_songname, al_albumName, a_artistName, s_genre, duration
                 FROM playlistsongs
@@ -48,8 +55,6 @@ def playlist_info():
                 )
             """
             cur.execute(check_followed, (playlist_id, user_id))
-
-            # If user follows playlist
             result = cur.fetchone()
             is_followed = result[0]
 
@@ -65,6 +70,7 @@ def playlist_info():
         conn.close()
 
     return render_template('playlist.html', songs=songs, is_followed=is_followed, playlist_name=playlist_name)
+
 
 @playlist_page.route('/delete_song', methods=['POST'])
 def delete_playlist_song():
@@ -95,9 +101,14 @@ def delete_playlist_song():
         message = f'Error when handling request: {str(e)}'
         return render_template('playlist.html', error=message)
 
+
 # Allow user to follow playlist or unfollow if they already are following
 @playlist_page.route('/follow_playlist', methods=['POST'])
+<<<<<<< HEAD
 def follow_or_unfollow_playlist():  # <-- You were missing this function definition
+=======
+def follow_playlist():
+>>>>>>> 5fcddc5 (Fixed formatting bug in playlist page python file)
     try:
         playlist_id = session.get('playlist_id')
         user_id = session.get('user_id')
@@ -107,7 +118,11 @@ def follow_or_unfollow_playlist():  # <-- You were missing this function definit
 
         conn = get_db_connection()
         with conn:
+<<<<<<< HEAD
             with conn.cursor() as cur:  # typo: you had `con.cursor()` instead of `conn.cursor()`
+=======
+            with conn.cursor() as cur:
+>>>>>>> 5fcddc5 (Fixed formatting bug in playlist page python file)
                 query = """
                     SELECT pf_playlistID
                     FROM playlist_followers
@@ -117,7 +132,7 @@ def follow_or_unfollow_playlist():  # <-- You were missing this function definit
                 is_followed = cur.fetchone()
 
                 if is_followed:
-                    # remove from followed
+                    # Remove from followed
                     remove_follow = """
                         DELETE FROM playlist_followers
                         WHERE pf_playlistID = %s AND pf_userID = %s
@@ -125,7 +140,7 @@ def follow_or_unfollow_playlist():  # <-- You were missing this function definit
                     cur.execute(remove_follow, (playlist_id, user_id))
                     message = 'Playlist successfully removed from your follow list'
                 else:
-                    # add to followed
+                    # Add to followed
                     add_follow = """
                         INSERT INTO playlist_followers (pf_playlistID, pf_userID)
                         VALUES (%s, %s)
