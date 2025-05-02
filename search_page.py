@@ -19,7 +19,8 @@ def song_search():
                     FROM song 
 					JOIN album ON s_albumID = al_albumID
                     JOIN artist ON al_artistID = a_artistID
-                    WHERE s_songname ILIKE %s;
+                    WHERE s_songname ILIKE %s
+                    LIMIT 20;
                 """
                 # applying % to beginning and end to make user error
                 # more forgiving in case of typos and to easier
