@@ -135,41 +135,32 @@ def playlist_select_handler():
 @playlist_list_page.route('/delete_playlist', methods=['POST'])
 def delete_playlist():
     try:
-        playlist_id = session.get('playlist_id')
-        curr_user_id = session.get('user_id')  # Define curr_user_id from the session
+        playlist_id = request.form.get("playlist_select")
+        curr_user_id = session.get('user_id')
 
         if not playlist_id:
-            return render_template('playlist_list.html', error="Error with session playlist id")
+            return render_template('playlist_list.html', error="Error with playlist id")
 
-        if not curr_user_id:  # Check if current user ID exists in session
+        if not curr_user_id:
             return render_template('playlist_list.html', error="Error with session user id")
 
-        if request.form.get('playlist_delete'):
-            conn = get_db_connection()
-            with conn:
-                with conn.cursor() as cur:
-                    # Delete the playlist
-                    query = """
-                        DELETE FROM playlist
-                        WHERE p_playlistID = %s
-                    """
-                    cur.execute(query, (playlist_id,))
+        conn = get_db_connection()
+        with conn.cursor() as cur:
+            query = """
+                    DELETE FROM playlist_followers 
+                    WHERE pf_playlistid = %s
+                """
+            cur.execute(query, (playlist_id,))
 
-                    message = 'Playlist successfully deleted!'
+            query = """
+                    DELETE FROM playlist 
+                    WHERE p_playlistid = %s AND p_author_userid = %s
+                """
+            cur.execute(query, (playlist_id, curr_user_id))
+            conn.commit()
 
-                    # Select all playlists a user is following
-                    query = """
-                        SELECT p_playlistID, p_playlistname, u_username
-                        FROM playlist
-                        JOIN playlist_followers ON pf_playlistID = p_playlistID
-                        JOIN user ON p_author_userid = u_userID
-                        WHERE pf_userID = %s;
-                    """
-                    cur.execute(query, (curr_user_id,))
-                    playlists = cur.fetchall()
-
-                    return render_template('playlist_list.html', message=message, playlists=playlists)
-
+        return redirect(url_for('playlist_list_page.user_playlists'))
+    
     except psycopg2.DatabaseError as e:
         message = f"Database error: {str(e)}"
         return render_template('playlist_list.html', error=message)

@@ -52,6 +52,8 @@
                         <th>Author</th>
                         {% if button_type.name == 'TOP10_LIST' %}
                             <th>Number of Followers</th>
+                        {% else %}
+                            <th>   </th>
                         {% endif %}
                         <th>   </th>
                     </tr>
@@ -66,6 +68,12 @@
                             {% else %}
                                 <td>{{ playlist[1] }}</td>
                                 <td>{{ playlist[2] }}</td>
+                                <td>
+                                    <form method="post" action="{{ url_for('playlist_list_page.delete_playlist') }}">
+                                        <input type="hidden" name="playlist_select" value="{{ playlist[0] }}">
+                                        <button type="submit" class="btn btn-outline-primary btn-sm">Delete</button>
+                                    </form>
+                                </td>
                             {% endif %}
                             <td>
                                 <form method="post" action="{{ url_for('playlist_list_page.playlist_select_handler') }}">
@@ -73,6 +81,7 @@
                                     <button type="submit" class="btn btn-outline-primary btn-sm">View Playlist</button>
                                 </form>
                             </td>
+                            
                         </tr>
                     {% endfor %}
                 </tbody>

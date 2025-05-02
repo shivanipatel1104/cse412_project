@@ -58,6 +58,7 @@
                         <th>Genre</th>
                         <th>Duration</th>
                         <th>   </th>
+                        <th>   </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -72,9 +73,15 @@
                             <form method="post">
                                 <input type="hidden" name="song_id" value="{{ song[0] }}">
                                 <button type="submit" name="action" value="select_playlist" class="btn btn-outline-primary btn-sm">Add to Playlist</button>
-                            </form>
-                            
+                            </form>   
                         </td>
+                        <td>
+                            <form method="post">
+                                <input type="hidden" name="song_id" value="{{ song[0] }}">
+                                <button type="submit" name="action" value="like_playlist" class="btn btn-outline-primary btn-sm">Like</button>
+                            </form>
+                        </td>
+                        
                         
                     </tr>
                     {% endfor %}

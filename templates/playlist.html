@@ -41,6 +41,8 @@
             
             {% if songs %}
             <h1 class="mb-4">{{ playlist_name }}</h1>
+            <button type="submit" class="btn btn-outline-primary btn-sm mb-4" action="{{ url_for('playlist_page.follow_or_unfollow_playlist') }}">Follow Playlist</button>
+            <button type="submit" class="btn btn-outline-primary btn-sm mb-4">Like Playlist</button>
             <table class="table table-striped">
                 <thead>
                     <tr>
