@@ -164,12 +164,14 @@ def song_play_handler():
                 print(f"Executing query: {query} with song_id {song_id}")
                 conn.commit()
 
-                query = 'SELECT s_times_played FROM song WHERE s_songID = %s'
+                query = 'SELECT s_songname, s_times_played FROM song WHERE s_songID = %s'
                 cur.execute(query, (song_id,))
 
-                times_played = cur.fetchone()[0]
+                result = cur.fetchone()
+                song_name = result[0]
+                times_played = result[1]
 
-        session['song_played_message'] = f'Song was successfully played! You have played this song {times_played} times!'
+        session['song_played_message'] = f'{song_name} was successfully played! You have played this song {times_played} times!'
 
     except psycopg2.DatabaseError as e:
         message = f"Database error: {str(e)}"

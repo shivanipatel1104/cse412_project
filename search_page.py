@@ -15,7 +15,7 @@ def song_search():
 
                 # I used ILIKE for case insensitive text based matching
                 query = """
-                    SELECT s_songname, al_albumName, a_artistName, s_genre, duration
+                    SELECT s_songid, s_songname, al_albumName, a_artistName, s_genre, duration
                     FROM song 
 					JOIN album ON s_albumID = al_albumID
                     JOIN artist ON al_artistID = a_artistID
@@ -61,4 +61,20 @@ def song_select_handler():
         mess = f'Error when handling request: {str(e)}'
         return render_template('search.html', error=mess)
 
+# Handle adding song to playlist
+@search_page.route('/add_to_playlist', methods=['POST'])
+def add_to_playlist():
+    try:
+        song_id = request.form.get('song_id')
 
+        if not song_id:
+            return render_template('search.html', error='Error when trying to obtain song id')
+
+        print(f"SONG ID FOR CHOSEN SONG: {song_id}")
+        session['song_id'] = song_id
+
+    except Exception as e:
+        mess = f'Error when handling request: {str(e)}'
+        return render_template('search.html', error=mess)
+
+    return redirect(url_for('playlist_select_page.show_playlists'))
