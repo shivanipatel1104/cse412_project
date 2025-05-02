@@ -5,7 +5,7 @@ def get_db_connection():
         host='localhost',
         database='music_app',
         user='postgres',
-        password='0411BPTp',
+        password='1104',
         port='5432',
     )
     return conn

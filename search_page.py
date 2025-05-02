@@ -15,11 +15,7 @@ def song_search():
 
                 # I used ILIKE for case insensitive text based matching
                 query = """
-<<<<<<< HEAD
                     SELECT s_songID, s_songname, al_albumName, a_artistName, s_genre, duration
-=======
-                    SELECT s_songid, s_songname, al_albumName, a_artistName, s_genre, duration
->>>>>>> f8181ddae43dde13be8f31a09a992759c7e4d82e
                     FROM song 
 					JOIN album ON s_albumID = al_albumID
                     JOIN artist ON al_artistID = a_artistID
