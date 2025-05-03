@@ -15,7 +15,6 @@ CREATE TABLE "artist" (
    	a_country VARCHAR(50) NOT NULL,
    	a_genre VARCHAR(50) NOT NULL,
     	a_userID INT UNIQUE NOT NULL,
-	a_pop INT, 
     FOREIGN KEY (a_userID) REFERENCES users(u_userID) ON DELETE CASCADE
 );
 
@@ -30,7 +29,7 @@ CREATE TABLE "album" (
 
 CREATE TABLE "song" (
 	s_songID SERIAL PRIMARY KEY,
-s_albumID INT NOT NULL, 
+	s_albumID INT NOT NULL, 
 	s_songname VARCHAR(50) NOT NULL,
 	s_genre VARCHAR(50) NOT NULL,
 	duration TIME NOT NULL,
@@ -44,7 +43,6 @@ CREATE TABLE "playlist" (
 	p_playlistname VARCHAR(50) NOT NULL,
 	p_author_userID INT NOT NULL,
 	p_timeCreated TIMESTAMP DEFAULT NOW(),
-	p_liked INT,
 	FOREIGN KEY (p_userID) REFERENCES users(u_userID) ON DELETE CASCADE
 );
 
