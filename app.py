@@ -15,7 +15,7 @@ app = Flask(__name__)
 # app.secret_key = 'secrets.token_urlsafe(16)'
 app.secret_key = '1234'
 
-# Register blueprints
+# register blueprints
 app.register_blueprint(login_page, url_prefix='/')
 app.register_blueprint(sign_up_page, url_prefix='/signup')
 app.register_blueprint(home_page, url_prefix='/home')

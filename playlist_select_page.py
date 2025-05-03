@@ -4,8 +4,7 @@ import psycopg2
 
 playlist_select_page = Blueprint('playlist_select_page', __name__)
 
-# Show list of playlists that user is author of
-# (user can only add songs to playlists they created)
+
 @playlist_select_page.route('/', methods=['GET'])
 def show_playlists():
 	try:
@@ -27,8 +26,6 @@ def show_playlists():
 
 	return render_template('playlist_select.html', playlists=playlists)
 
-# Add song to playlist, and redirect user to playlist list page to see that the
-# song has been added
 @playlist_select_page.route('/playlist_selected', methods=['POST'])
 def playlist_selected():
 	try:

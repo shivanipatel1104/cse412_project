@@ -4,9 +4,7 @@ import psycopg2
 
 playlist_page = Blueprint('playlist_page', __name__)
 
-# Show songs in user playlist. Also is_followed functionality:
-# If user follows playlist, then set is_followed to True, else False.
-# is_followed is for changing status of 'followed' button (i.e., toggle between 'followed' and 'unfollowed').
+
 @playlist_page.route('/', methods=['GET'])
 def playlist_info():
     playlist_id = session.get('playlist_id')
@@ -27,7 +25,6 @@ def playlist_info():
             row = cur.fetchone()
             playlist_name = row[0] if row else "Untitled Playlist"
 
-            # Show song name, album name, and artist name for each song in the playlist
             query = """
                 SELECT s_songID, s_songname, al_albumName, a_artistName, s_genre, duration
                 FROM playlistsongs
@@ -95,7 +92,6 @@ def delete_playlist_song():
     return redirect(url_for('playlist_page.playlist_info'))
 
 
-# Allow user to follow playlist or unfollow if they already are following
 @playlist_page.route('/follow_playlist', methods=['POST'])
 def follow_or_unfollow_playlist():
     try:
@@ -117,7 +113,7 @@ def follow_or_unfollow_playlist():
                 is_followed = cur.fetchone()
 
                 if is_followed:
-                    # Remove from followed
+                  
                     remove_follow = """
                         DELETE FROM playlist_followers
                         WHERE pf_playlistID = %s AND pf_userID = %s
@@ -125,7 +121,7 @@ def follow_or_unfollow_playlist():
                     cur.execute(remove_follow, (playlist_id, user_id))
                     message = 'Playlist successfully removed from your follow list'
                 else:
-                    # Add to followed
+
                     add_follow = """
                         INSERT INTO playlist_followers (pf_playlistID, pf_userID)
                         VALUES (%s, %s)
@@ -143,7 +139,6 @@ def follow_or_unfollow_playlist():
         message = f'Error when handling request: {str(e)}'
         return render_template('playlist.html', error=message)
 
-# Handle song being played (play button being clicked)
 @playlist_page.route('/play', methods=['POST'])
 def song_play_handler():
     try:
@@ -152,7 +147,6 @@ def song_play_handler():
         if not song_id:
             return render_template('playlist.html', error='Error retrieving song id')
 
-        # Connect to the database
         conn = get_db_connection()
         with conn:
             with conn.cursor() as cur:
@@ -182,7 +176,7 @@ def song_play_handler():
 
     return redirect(url_for('playlist_page.playlist_info'))
 
-# Handle liking song
+
 @playlist_page.route('/like', methods = ['POST'])
 def like_song_handler():
     try:
@@ -198,7 +192,7 @@ def like_song_handler():
         conn = get_db_connection()
         with conn:
             with conn.cursor() as cur:
-                # Get song name
+               
                 song_name_query = 'SELECT s_songname FROM song WHERE s_songID = %s'
                 cur.execute(song_name_query, (song_id,))
                 result = cur.fetchone()
@@ -210,7 +204,7 @@ def like_song_handler():
                     mess = 'Error: song id does not exist'
                     return render_template('playlist.html', error=mess)
 
-                # Checking if song is in user's liked songs
+                
                 query = """
                     SELECT *
                     FROM likedsongs
@@ -219,7 +213,7 @@ def like_song_handler():
                 cur.execute(query, (user_id, song_id))
                 is_liked = cur.fetchone()
 
-                # If is in user's liked songs, then remove it
+                
                 if is_liked:
                     message = f"{song_name} removed from liked songs!"
                     query = """
@@ -228,7 +222,7 @@ def like_song_handler():
                     """
                     cur.execute(query, (user_id, song_id))
 
-                # If not in user's liked songs, then add it
+                
                 else:
                     message = f"{song_name} added to liked songs!"
                     query = """
@@ -238,7 +232,6 @@ def like_song_handler():
                     cur.execute(query, (user_id, song_id))
                 
 
-                # Fetch song data for message
                 song_data_query = """
                     SELECT s_songname
                     FROM song

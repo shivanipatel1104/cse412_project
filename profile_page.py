@@ -4,7 +4,6 @@ import psycopg2
 
 profile_page = Blueprint('profile_page', __name__)
 
-# Show saved user info
 @profile_page.route('/', methods=['GET'])
 def profile():
     try:
@@ -41,7 +40,6 @@ def profile():
 
     return render_template('profile.html', user_info=user_info)
 
-# option to update password
 @profile_page.route('/change_password', methods=['POST'])
 def change_password():
     try:

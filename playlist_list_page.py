@@ -4,25 +4,21 @@ import psycopg2
 from enum import Enum
 from datetime import datetime
 
-# defining enum type for clearer handling of button logic
+
 class PlaylistType(Enum):
-    TOP10_LIST = 'top10_list' # to show top 10 most followed playlists
-    USER_LIST = 'user_list' # to show playlists current user follows
-    CREATE_PLAYLIST = 'create_playlist' # to show pop up to create playlist
+    TOP10_LIST = 'top10_list' 
+    USER_LIST = 'user_list'
+    CREATE_PLAYLIST = 'create_playlist' 
 
 playlist_list_page = Blueprint('playlist_list_page', __name__)
 
-# Function shows a list of playlists to the user. There are two types of lists:
-#       --> Playlist user follows (default if no button is pressed)
-#       --> Top 10 most followed playlists
-# Which list is shown is decided by which button is pressed (request named 'button_click')
 @playlist_list_page.route('/', methods=['GET', 'POST'])
 def user_playlists():
-    # Intitializing values
+    
     playlists = []
-    button_type = PlaylistType.USER_LIST # user list is default
+    button_type = PlaylistType.USER_LIST 
 
-    # fetch user id for current user from session
+   
     curr_user_id = session['user_id']
     if not curr_user_id:
         return render_template('playlist_list.html', error='User session credentials are not authorized')
@@ -30,18 +26,18 @@ def user_playlists():
         conn = get_db_connection()
 
         with conn.cursor() as cur:
-            button_string = request.form.get("button_click") # ***fetch which button was clicked ("button_click" is input name)***
+            button_string = request.form.get("button_click") 
 
             if button_string:
                 try:
                     button_type = PlaylistType(button_string)
                 except ValueError:
-                    button_type = PlaylistType.USER_LIST # use default case in case of unknown behavior
+                    button_type = PlaylistType.USER_LIST 
 
-            # button for creating a playlist
+      
             if button_type == PlaylistType.CREATE_PLAYLIST:
                 playlist_name = request.form.get("playlist_name")
-                author_id = session.get('user_id') # author of playlist is current user
+                author_id = session.get('user_id') 
                 time_created = datetime.now()
 
                 if not playlist_name:
@@ -61,8 +57,6 @@ def user_playlists():
                     VALUES (%s, %s)
                 """
 
-                # I needed to make sure that when a playlist was created, it was
-                # also added to the creator's followed playlist table in the db
 
                 cur.execute(playlist_query, (playlist_name, author_id, time_created))
                 conn.commit()
@@ -112,10 +106,10 @@ def user_playlists():
         message = f'Error when handling request: {str(e)}'
         return render_template('playlist_list.html', error=message)
 
-    #Using button_type parameter for easier rendering of correct list
+   
     return render_template('playlist_list.html', playlists=playlists, button_type=button_type)
 
-# For selecting a playlist and going to that playlist page
+
 @playlist_list_page.route('/select_playlist', methods=['POST'])
 def playlist_select_handler():
     try:
@@ -131,7 +125,7 @@ def playlist_select_handler():
         message = f'Error when handling request: {str(e)}'
         return render_template('playlist_list.html', error=message)
 
-# Delete button needed for deleting playlist from user playlist section
+
 @playlist_list_page.route('/delete_playlist', methods=['POST'])
 def delete_playlist():
     try:

@@ -20,7 +20,7 @@ def login():
                     return render_template('login.html', error="Incorrect username or password.")
                 else:
                     session['user_id'] = login_data[0]
-                    return redirect(url_for('home_page.home'))  # Redirect to home page
+                    return redirect(url_for('home_page.home'))  
 
         except psycopg2.DatabaseError as e:
             message = f"Database error: {str(e)}"

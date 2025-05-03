@@ -4,7 +4,7 @@ import psycopg2
 
 search_page = Blueprint('search_page', __name__)
 
-# Shows results of searched song name with some pattern matching
+
 @search_page.route('/', methods=['GET', 'POST'])
 def song_search():
     if request.method == 'POST':
@@ -13,7 +13,7 @@ def song_search():
             with conn.cursor() as cur:
                 user_search = request.form.get('search_query')
 
-                # I used ILIKE for case insensitive text based matching
+              
                 query = """
                     SELECT s_songID, s_songname, al_albumName, a_artistName, s_genre, duration
                     FROM song 
@@ -22,13 +22,11 @@ def song_search():
                     WHERE s_songname ILIKE %s
                     LIMIT 20;
                 """
-                # applying % to beginning and end to make user error
-                # more forgiving in case of typos and to easier
-                # search functionality
+               
                 cur.execute(query, (f"%{user_search}%",))
                 songs = cur.fetchall()
 
-                # In case no songs match the user's search
+                
                 if not songs:
                     message = "No songs found matching your search."
                     return render_template('search.html', error=message)
@@ -45,7 +43,7 @@ def song_search():
 
     return render_template('search.html') 
 
-# Handle song selection functionality
+
 @search_page.route('/', methods=['POST'])
 def song_select_handler():
     try:

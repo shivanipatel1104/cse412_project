@@ -4,7 +4,7 @@ import psycopg2
 
 liked_songs_page = Blueprint('liked_songs_page', __name__)
 
-# Selecting liked songs
+
 @liked_songs_page.route('/', methods=['GET'])
 def liked_songs():
 	try:
@@ -59,7 +59,7 @@ def delete_liked_song():
         conn = get_db_connection()
         with conn:
             with conn.cursor() as cur:
-                # Get song name
+                
                 song_name_query = 'SELECT s_songname FROM song WHERE s_songID = %s'
                 cur.execute(song_name_query, (song_id,))
                 result = cur.fetchone()
@@ -71,7 +71,7 @@ def delete_liked_song():
                     mess = 'Error: song id does not exist'
                     return render_template('liked_songs.html', error=mess)
 
-                # Checking if song is in user's liked songs
+               
                 query = """
                     SELECT *
                     FROM likedsongs
@@ -80,7 +80,7 @@ def delete_liked_song():
                 cur.execute(query, (user_id, song_id))
                 is_liked = cur.fetchone()
 
-                # If is in user's liked songs, then remove it
+                
                 if is_liked:
                     message = f"{song_name} removed from liked songs!"
                     query = """
@@ -89,7 +89,7 @@ def delete_liked_song():
                     """
                     cur.execute(query, (user_id, song_id))
 
-                # Fetch song data for message
+                
                 song_data_query = """
                     SELECT s_songname
                     FROM song

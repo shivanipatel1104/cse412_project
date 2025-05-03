@@ -4,11 +4,6 @@ import psycopg2
 
 song_page = Blueprint('song_page', __name__)
 
-# Show song information
-# Check if song if song is liked. If it is liked, then the is_liked
-# parameter is set to true, else false. Example: can be used to change
-# text of 'like button' to 'liked' or 'not liked' depending on value of
-# is_liked
 @song_page.route('/', methods=['GET'])
 def song_info():
     user_id = session.get('user_id')
@@ -54,7 +49,7 @@ def song_info():
 
     return render_template('song.html', song_data=song_data, is_liked=is_liked)
 
-# Handle song being played (play button being clicked)
+
 @song_page.route('/play', methods=['POST'])
 def song_play_handler():
     try:
@@ -87,7 +82,6 @@ def song_play_handler():
         message = f'Error when handling request: {str(e)}'
         return render_template('playlist_list.html', error=message)
 
-# Handle song being liked or unliked
 @song_page.route('/like', methods=['POST'])
 def song_like_handler():
     try:
@@ -106,7 +100,6 @@ def song_like_handler():
             conn = get_db_connection()
             with conn:
                 with conn.cursor() as cur:
-                    # Checking if song is in user's liked songs
                     query = """
                         SELECT *
                         FROM likedsongs
@@ -115,14 +108,13 @@ def song_like_handler():
                     cur.execute(query, (user_id, song_id))
                     is_liked = cur.fetchone()
 
-                    # If is in user's liked songs, then remove it
                     if is_liked:
                         message = "Song removed from liked songs!"
                         query = """
                             DELETE FROM liked_songs
                             WHERE l_userID = %s AND l_songID = %s 
                         """
-                    # If not in user's liked songs, then add it
+                    
                     else:
                         message = "Song added to liked songs!"
                         query = """
@@ -131,7 +123,7 @@ def song_like_handler():
                         """
                     cur.execute(query, (user_id, song_id))
 
-                    # Fetch song data again to reload page
+                    
                     song_data_query = """
                         SELECT s_songname, s_genre, s_duration
                         FROM song
