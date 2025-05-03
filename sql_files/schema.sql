@@ -55,12 +55,12 @@ CREATE TABLE "playlistsongs" (
 );
 
 CREATE TABLE "playlist_followers" (
-  pf_id SERIAL PRIMARY KEY,
-  pf_playlistID INT NOT NULL,
-  pf_userID INT NOT NULL,
-  FOREIGN KEY (pf_playlistID) REFERENCES playlist(p_playlistID) ON DELETE CASCADE,
-  FOREIGN KEY (pf_userID) REFERENCES users(u_userID) ON DELETE CASCADE,
-  UNIQUE (pf_playlistID, pf_userID)
+  	pf_id SERIAL PRIMARY KEY,
+ 	pf_playlistID INT NOT NULL,
+  	pf_userID INT NOT NULL,
+  	FOREIGN KEY (pf_playlistID) REFERENCES playlist(p_playlistID) ON DELETE CASCADE,
+  	FOREIGN KEY (pf_userID) REFERENCES users(u_userID) ON DELETE CASCADE,
+  	UNIQUE (pf_playlistID, pf_userID)
 );
 
 CREATE TABLE "likedsongs" ( 
